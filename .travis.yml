@@ -1,0 +1,16 @@
+services:
+- docker
+script:
+- docker build -t wtanaka/ubuntu-1604-make .
+- >
+  docker run wtanaka/ubuntu-1604-make make --version
+  2>&1 | grep "GNU Make 4"
+# Make sure it is still possible to use apt
+- >
+  docker run wtanaka/ubuntu-1604-make sh -c "apt-get update && apt-get install less"
+after_success:
+- >
+  curl -H "Content-Type: application/json"
+  --data '{"source_type": "Branch", "source_name": "master"}'
+  -X POST
+  https://registry.hub.docker.com/u/wtanaka/ubuntu-1604-make/trigger/6d921be7-ceb4-419c-ad5b-c7305c3462ec/
